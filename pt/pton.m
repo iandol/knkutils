@@ -60,6 +60,12 @@ if ~exist('wantstereo','var') || isempty(wantstereo)
   wantstereo = 0;
 end
 
+if isempty(resolution)
+	panelfitter = true;
+else
+	panelfitter = false;
+end
+
 % make sure ptoff
 ptoff;
 
@@ -69,12 +75,14 @@ AssertOpenGL;
 % which screen will we be operating upon?
 screennum = max(Screen('Screens'));
 
+Screen('Preference', 'VisualDebugLevel', 3);
+
+PsychImaging('PrepareConfiguration');
+PsychImaging('AddTask', 'General', 'UseFastOffscreenWindows');
+
 % deal with stereo stuff
 if wantstereo
-
   % NOTE: we assume useHardwareStereo==1 is true!!
-
-  PsychImaging('PrepareConfiguration');
   PsychImaging('AddTask', 'General', 'UseDataPixx');
   %%%PsychImaging('AddTask', 'AllViews', 'RestrictProcessing', CenterRect([0 0 512 512], Screen('Rect', screennum)));
   Datapixx('Open');
@@ -85,12 +93,13 @@ if wantstereo
     Datapixx('EnableVideoLcd3D60Hz');
   end
   Datapixx('RegWr');
-
 end
 
+if panelfitter
+	PsychImaging('AddTask', 'General', 'UsePanelFitter', [1024 768],'Aspect');
 % set the resolution of the screen
-if ~isempty(resolution)
-  SetResolution(screennum,resolution(1),resolution(2),resolution(3),resolution(4));
+elseif ~isempty(resolution)
+  SetResolution(screennum,resolution(1),resolution(2),resolution(3));
 end
 
 % set the sync
@@ -111,7 +120,7 @@ if wantstereo
   [win,rect] = PsychImaging('OpenWindow', screennum, 127, rect, [], [], 1);
   SetStereoBlueLineSyncParameters(win, rect(4)+10);
 else
-  [win,rect] = Screen('OpenWindow',screennum,127,rect);
+  [win,rect] = PsychImaging('OpenWindow', screennum, 127);
 end
 
 % record the current clut

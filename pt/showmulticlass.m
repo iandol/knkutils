@@ -1,7 +1,8 @@
 function [images,maskimages] = showmulticlass(outfile,offset,movieflip,frameduration,fixationinfo,fixationsize, ...
   triggerfun,ptonparams,soafun,skiptrials,images,setnum,isseq,grayval,iscolor, ...
   numrep,con,existingfile,dres,triggerkey,framefiles,trialparams,eyelinkfile,maskimages,specialoverlay, ...
-  stimulusdir,frameevents,framefuncs,setupscript,cleanupscript,stereoflip)
+  stimulusdir,frameevents,framefuncs,setupscript,cleanupscript,stereoflip,...
+  tTime,nRepeats)
 
 % function [images,maskimages] = showmulticlass(outfile,offset,movieflip,frameduration,fixationinfo,fixationsize, ...
 %   triggerfun,ptonparams,soafun,skiptrials,images,setnum,isseq,grayval,iscolor, ...
@@ -255,6 +256,13 @@ function [images,maskimages] = showmulticlass(outfile,offset,movieflip,framedura
 
 if ~exist('stimulusdir','var') || isempty(stimulusdir)
   stimulusdir = absolutepath(strrep(which('showmulticlass'),'showmulticlass.m',''));
+end
+
+if ~exist('tTime','var') || isempty(tTime)
+	tTime = 300;
+end
+if ~exist('nRepeats','var') || isempty(nRepeats)
+	nRepeats = 8;
 end
 
 %%%%%%%%%%%%% some constants
@@ -2430,6 +2438,8 @@ else
 end
 
 % some abbrevations for the retinotopy cases
+
+
 switch setnum(1)
 case {73 74 75 76 77}
   firstslot = 16*15 + (1:4*32*15);
@@ -2456,20 +2466,20 @@ case {89 90 91 92 93 94  101 102 103 104 105 106}
     dfactor0 = 1;
   end
 
-  totalframesstandard = 300*15;  % 300 s exactly
-  cycleslots = 22*15 + (1:8*32*15);  % after 22-s rest, 8 cycles of 32 s
-  mashcycles = randintrange(1,100,[1 8*32*15],1);  % long string of 8*32 stimuli
+  totalframesstandard = tTime*15;  % 300 s exactly
+  cycleslots = 22*15 + (1:nRepeats*32*15);  % after 22-s rest, 8 cycles of 32 s
+  mashcycles = randintrange(1,100,[1 nRepeats*32*15],1);  % long string of 8*32 stimuli
   mashgapcycles = [];  % interrupted 28/4 stimuli
-  for nn=1:8
+  for nn=1:nRepeats
     mashgapcycles = [mashgapcycles randintrange(1,100,[1 28*15],1) zeros(1,4*15)];
   end
   mashgapcyclesSP = mashgapcycles;  % special for contracting-ring case
   mashgapcyclesSP(1:32*15:end) = 0;
   mashgaponecyclefun = @() upsamplematrix(randintrange(1,100,[1 28*15/dfactor0],1),dfactor0,2,[],'nearest');  % just do stimuli for one 28-s thing
-  standardcycles = repmat(1:32*15,[1 8]);        % repeat a regular 32-s stim 8 times
-  reversecycles = repmat([1 32*15:-1:2],[1 8]);  % repeat a reversed 32-s stim 8 times
-  standardgapcycles = repmat([1:28*15 zeros(1,4*15)],[1 8]);       % regular order for 28/4 interruptions
-  reversegapcycles = repmat([0 28*15:-1:2 zeros(1,4*15)],[1 8]);   % reversed order for contracting-ring-specific!
+  standardcycles = repmat(1:32*15,[1 nRepeats]);        % repeat a regular 32-s stim 8 times
+  reversecycles = repmat([1 32*15:-1:2],[1 nRepeats]);  % repeat a reversed 32-s stim 8 times
+  standardgapcycles = repmat([1:28*15 zeros(1,4*15)],[1 nRepeats]);       % regular order for 28/4 interruptions
+  reversegapcycles = repmat([0 28*15:-1:2 zeros(1,4*15)],[1 nRepeats]);   % reversed order for contracting-ring-specific!
   standardgaponecycle = 1:28*15;
   reversegaponecycle = [1 28*15:-1:2];  % note the first 1 is really a blank anyway.
   

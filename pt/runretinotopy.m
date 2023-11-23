@@ -1,17 +1,20 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%% EXPERIMENT PARAMETERS (edit as necessary)
 
-% display
-ptres = [1024 768 60 32];  % display resolution. [] means to use current display resolution.
+tTime = 150;
+nRepeats = 4;
 
+% display
+%ptres = [1024 768 60];  % display resolution. [] means to use current display resolution.
+ptres = [];
 % fixation dot
 fixationinfo = {uint8([255 0 0; 0 0 0; 255 255 255]) 0.5};  % dot colors and alpha value
-fixationsize = 4;          % dot size in pixels
+fixationsize = 8;          % dot size in pixels
 meanchange = 3;            % dot changes occur with this average interval (in seconds)
 changeplusminus = 2;       % plus or minus this amount (in seconds)
 
 % trigger
-triggerkey = 't';          % stimulus starts when this key is detected
-tfun = @() fprintf('STIMULUS STARTED.\n');  % function to call once trigger is detected
+triggerkey = 's';          % stimulus starts when this key is detected
+tfun = @() fprintf('\n\n!!! STIMULUS STARTED. !!! \n');  % function to call once trigger is detected
 
 % tweaking
 offset = [0 0];            % [X Y] where X and Y are the horizontal and vertical
@@ -21,7 +24,7 @@ movieflip = [0 0];         % [A B] where A==1 means to flip vertical dimension
                            % and B==1 means to flip horizontal dimension
 
 % directories
-stimulusdir = '/';         % path to directory that contains the stimulus .mat files
+stimulusdir = '/home/cog5/Documents/analyzePRF';         % path to directory that contains the stimulus .mat files
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% DO NOT EDIT BELOW
 
@@ -31,10 +34,10 @@ randn('state',sum(100*clock));
 
 % ask the user what to run
 if ~exist('subjnum','var') 
-  subjnum = input('What is the subj id? ')
+  subjnum = input('What is the subj id? ');
 end
-expnum = input('What experiment (89=CCW, 90=CW, 91=expand, 92=contract, 93=multibar, 94=wedgeringmash)? ')
-runnum = input('What run number (for filename)? ')
+expnum = input('What experiment (89=CCW, 90=CW, 91=expand, 92=contract, 93=multibar, 94=wedgeringmash)? ');
+runnum = input('What run number (for filename)? ');
 
 % prepare inputs
 trialparams = [];
@@ -59,7 +62,8 @@ filename = sprintf('%s_subj%d_run%02d_exp%02d.mat',gettimestring,subjnum,runnum,
 [images,maskimages] = ...
   showmulticlass(filename,offset,movieflip,frameduration,fixationinfo,fixationsize,tfun, ...
                  ptonparams,soafun,0,images,expnum,[],grayval,iscolor,[],[],[],dres,triggerkey, ...
-                 [],trialparams,[],maskimages,a1.specialoverlay,stimulusdir);
+                 [],trialparams,[],maskimages,a1.specialoverlay,stimulusdir,...
+				 [],[],[],[],[],tTime,nRepeats);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
